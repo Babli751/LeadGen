@@ -8,9 +8,9 @@ services:
     environment:
       - DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres:5432/${POSTGRES_DB}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
-      - POSTGRES_USER=${POSTGRES_USER}
-      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
-      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=leadgen
+      - POSTGRES_PASSWORD=securepassword123!
+      - POSTGRES_DB=leadgen_db
     volumes:
       - ./backend:/app
     depends_on:

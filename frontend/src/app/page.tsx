@@ -23,9 +23,9 @@ const searchSchema = z.object({
 type Lead = {
   id: number;
   name: string;
-  email: string;
-  phone: string;
-  website: string;
+  email: string | null;
+  phone: string | null;
+  website: string | null;
   address: string;
   status: string;
 };
@@ -34,6 +34,7 @@ export default function LeadGenerationPage() {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [selectedLeads, setSelectedLeads] = useState<number[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   
   const { register, handleSubmit, formState: { errors } } = useForm({
     resolver: zodResolver(searchSchema),
@@ -47,16 +48,24 @@ export default function LeadGenerationPage() {
   const onSubmit = async (data: any) => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/search', {
+      const response = await fetch(`http://localhost:8000/api/search`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
       });
+      
+      if (!response.ok) {
+        throw new Error('API request failed');
+      }
+      
       const result = await response.json();
-      setLeads(result.leads);
+      setLeads(result.leads || []);
+      setSelectedLeads([]);
+      alert(`${result.leads?.length || 0} lead bulundu`);
     } catch (error) {
+      alert("Arama sırasında hata oluştu");
       console.error('Error:', error);
     } finally {
       setIsLoading(false);
@@ -72,28 +81,42 @@ export default function LeadGenerationPage() {
   };
 
   const sendEmails = async () => {
-    if (selectedLeads.length === 0) return;
+    if (selectedLeads.length === 0) {
+      alert("Lütfen en az bir lead seçin");
+      return;
+    }
     
-    const subject = "İşbirliği Teklifi";
-    const body = `Merhaba,\n\nSizinle işbirliği yapmak istiyoruz.\n\nSaygılarımızla,\n[Şirket Adı]`;
-    
+    setIsSending(true);
     try {
-      const response = await fetch('/api/send-emails', {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/api/send-emails`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
           lead_ids: selectedLeads,
-          subject,
-          body,
+          subject: "İşbirliği Teklifi",
+          body: `Merhaba,\n\nSizinle işbirliği yapmak istiyoruz.\n\nSaygılarımızla,\n[Şirket Adınız]`,
           sender_email: "your-email@example.com",
         }),
       });
+      
+      if (!response.ok) {
+        throw new Error('Email sending failed');
+      }
+      
       const result = await response.json();
-      alert(result.message);
+      alert(result.message || "E-postalar başarıyla gönderildi");
+      
+      // Durumları güncelle
+      setLeads(prev => prev.map(lead => 
+        selectedLeads.includes(lead.id) ? { ...lead, status: "email_sent" } : lead
+      ));
     } catch (error) {
+      alert("E-posta gönderilirken hata oluştu");
       console.error('Error:', error);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -105,25 +128,27 @@ export default function LeadGenerationPage() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div>
             <Input
-              placeholder="İşletme türü (örn: plumber)"
+              placeholder="İşletme türü (örn: tesisatçı)"
               {...register("query")}
             />
-            {errors.query && <p className="text-red-500 text-sm">{errors.query.message}</p>}
+            {errors.query && <p className="text-red-500 text-sm mt-1">{errors.query.message?.toString()}</p>}
           </div>
           <div>
             <Input
-              placeholder="Konum (örn: Berlin)"
+              placeholder="Konum (örn: İstanbul)"
               {...register("location")}
             />
-            {errors.location && <p className="text-red-500 text-sm">{errors.location.message}</p>}
+            {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location.message?.toString()}</p>}
           </div>
           <div>
             <Input
               type="number"
               placeholder="Maksimum sonuç"
+              min={5}
+              max={100}
               {...register("maxResults", { valueAsNumber: true })}
             />
-            {errors.maxResults && <p className="text-red-500 text-sm">{errors.maxResults.message}</p>}
+            {errors.maxResults && <p className="text-red-500 text-sm mt-1">{errors.maxResults.message?.toString()}</p>}
           </div>
         </div>
         <Button type="submit" disabled={isLoading}>
@@ -135,8 +160,11 @@ export default function LeadGenerationPage() {
         <div className="mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold">Bulunan Leadler ({leads.length})</h2>
-            <Button onClick={sendEmails} disabled={selectedLeads.length === 0}>
-              Seçilenlere E-posta Gönder ({selectedLeads.length})
+            <Button 
+              onClick={sendEmails} 
+              disabled={selectedLeads.length === 0 || isSending}
+            >
+              {isSending ? "Gönderiliyor..." : `Seçilenlere E-posta Gönder (${selectedLeads.length})`}
             </Button>
           </div>
           
@@ -144,7 +172,7 @@ export default function LeadGenerationPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Seç</TableHead>
+                  <TableHead className="w-12">Seç</TableHead>
                   <TableHead>İsim</TableHead>
                   <TableHead>E-posta</TableHead>
                   <TableHead>Telefon</TableHead>
@@ -161,6 +189,7 @@ export default function LeadGenerationPage() {
                         type="checkbox"
                         checked={selectedLeads.includes(lead.id)}
                         onChange={() => handleSelectLead(lead.id)}
+                        className="h-4 w-4"
                       />
                     </TableCell>
                     <TableCell>{lead.name}</TableCell>
@@ -168,13 +197,26 @@ export default function LeadGenerationPage() {
                     <TableCell>{lead.phone || "-"}</TableCell>
                     <TableCell>
                       {lead.website ? (
-                        <a href={lead.website} target="_blank" rel="noopener noreferrer">
+                        <a 
+                          href={lead.website.startsWith('http') ? lead.website : `https://${lead.website}`}
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
                           Siteyi Gör
                         </a>
                       ) : "-"}
                     </TableCell>
                     <TableCell>{lead.address}</TableCell>
-                    <TableCell>{lead.status}</TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        lead.status === "email_sent" 
+                          ? "bg-green-100 text-green-800" 
+                          : "bg-gray-100 text-gray-800"
+                      }`}>
+                        {lead.status === "email_sent" ? "Gönderildi" : "Yeni"}
+                      </span>
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
