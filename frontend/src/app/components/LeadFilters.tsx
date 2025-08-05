@@ -45,56 +45,56 @@ export function LeadFilters({ onFiltersChange, totalCount, filteredCount }: Lead
   };
 
   return (
-    <div className="bg-gray-50 p-4 rounded-lg mb-6">
-      <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center justify-between">
-        <div className="flex flex-col sm:flex-row gap-4 flex-1">
+    <div className="bg-gray-50 p-3 sm:p-4 rounded-lg mb-6">
+      <div className="flex flex-col lg:flex-row gap-3 sm:gap-4 items-start lg:items-center justify-between">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 flex-1 w-full lg:w-auto">
           {/* Search within results */}
-          <div className="min-w-[200px]">
+          <div className="w-full sm:min-w-[200px] sm:max-w-[250px]">
             <Input
               placeholder="Lead'lerde ara..."
               value={filters.searchTerm}
               onChange={(e) => handleFilterChange({ searchTerm: e.target.value })}
-              className="w-full"
+              className="w-full mobile-button"
             />
           </div>
 
           {/* Contact info filters */}
-          <div className="flex flex-wrap gap-2">
-            <label className="flex items-center gap-2 text-sm">
+          <div className="flex flex-wrap gap-2 sm:gap-3">
+            <label className="flex items-center gap-2 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded">
               <input
                 type="checkbox"
                 checked={filters.hasEmail}
                 onChange={(e) => handleFilterChange({ hasEmail: e.target.checked })}
                 className="h-4 w-4"
               />
-              E-posta var
+              <span className="whitespace-nowrap">E-posta var</span>
             </label>
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded">
               <input
                 type="checkbox"
                 checked={filters.hasPhone}
                 onChange={(e) => handleFilterChange({ hasPhone: e.target.checked })}
                 className="h-4 w-4"
               />
-              Telefon var
+              <span className="whitespace-nowrap">Telefon var</span>
             </label>
-            <label className="flex items-center gap-2 text-sm">
+            <label className="flex items-center gap-2 text-sm cursor-pointer hover:bg-white px-2 py-1 rounded">
               <input
                 type="checkbox"
                 checked={filters.hasWebsite}
                 onChange={(e) => handleFilterChange({ hasWebsite: e.target.checked })}
                 className="h-4 w-4"
               />
-              Website var
+              <span className="whitespace-nowrap">Website var</span>
             </label>
           </div>
 
           {/* Status filter */}
-          <div className="min-w-[120px]">
+          <div className="w-full sm:min-w-[140px] sm:max-w-[160px]">
             <select
               value={filters.statusFilter}
               onChange={(e) => handleFilterChange({ statusFilter: e.target.value as FilterOptions['statusFilter'] })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm mobile-button"
             >
               <option value="all">Tüm Durumlar</option>
               <option value="new">Yeni</option>
@@ -103,15 +103,16 @@ export function LeadFilters({ onFiltersChange, totalCount, filteredCount }: Lead
           </div>
         </div>
 
-        <div className="flex gap-2 items-center">
-          <span className="text-sm text-gray-600 whitespace-nowrap">
+        <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center w-full lg:w-auto">
+          <span className="text-sm text-gray-600 whitespace-nowrap order-2 sm:order-1">
             {filteredCount} / {totalCount} lead
           </span>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={clearAllFilters}
             disabled={!filters.hasEmail && !filters.hasPhone && !filters.hasWebsite && filters.statusFilter === 'all' && !filters.searchTerm}
+            className="mobile-button w-full sm:w-auto order-1 sm:order-2"
           >
             Filtreleri Temizle
           </Button>
