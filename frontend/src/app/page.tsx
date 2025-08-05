@@ -275,7 +275,7 @@ export default function LeadGenerationPage() {
           </div>
           
           <div className="border rounded-lg overflow-hidden">
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto mobile-table-scroll">
               <Table>
                 <TableHeader>
                   <TableRow>
