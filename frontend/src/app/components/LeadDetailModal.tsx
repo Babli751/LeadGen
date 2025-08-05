@@ -55,29 +55,29 @@ export function LeadDetailModal({ lead, isOpen, onClose, onUpdateLead, onSendEma
   const currentLead = isEditing ? editedLead : lead;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2 sm:p-4">
+      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto modal-content">
         {/* Header */}
-        <div className="flex justify-between items-center p-6 border-b">
-          <h2 className="text-xl font-semibold">Lead Detayları</h2>
-          <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 sm:p-6 border-b gap-3 sm:gap-2">
+          <h2 className="text-lg sm:text-xl font-semibold">Lead Detayları</h2>
+          <div className="flex gap-2 w-full sm:w-auto">
             {!isEditing ? (
-              <Button variant="outline" size="sm" onClick={handleEditStart}>
+              <Button variant="outline" size="sm" onClick={handleEditStart} className="mobile-button flex-1 sm:flex-none">
                 Düzenle
               </Button>
             ) : (
               <>
-                <Button variant="outline" size="sm" onClick={handleEditCancel}>
+                <Button variant="outline" size="sm" onClick={handleEditCancel} className="mobile-button flex-1 sm:flex-none">
                   İptal
                 </Button>
-                <Button size="sm" onClick={handleEditSave}>
+                <Button size="sm" onClick={handleEditSave} className="mobile-button flex-1 sm:flex-none">
                   Kaydet
                 </Button>
               </>
             )}
-            <button 
+            <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 text-xl font-bold p-1"
+              className="text-gray-400 hover:text-gray-600 text-xl font-bold p-1 ml-2"
             >
               ×
             </button>
@@ -85,9 +85,9 @@ export function LeadDetailModal({ lead, isOpen, onClose, onUpdateLead, onSendEma
         </div>
 
         {/* Content */}
-        <div className="p-6 space-y-6">
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Basic Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">İşletme Adı</label>
               {isEditing ? (
@@ -113,7 +113,7 @@ export function LeadDetailModal({ lead, isOpen, onClose, onUpdateLead, onSendEma
           </div>
 
           {/* Contact Info */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">E-posta</label>
               {isEditing ? (
@@ -122,6 +122,7 @@ export function LeadDetailModal({ lead, isOpen, onClose, onUpdateLead, onSendEma
                   value={currentLead?.email || ''}
                   onChange={(e) => handleInputChange('email', e.target.value)}
                   placeholder="E-posta adresi"
+                  className="mobile-button"
                 />
               ) : (
                 <div className="py-2">
@@ -147,6 +148,7 @@ export function LeadDetailModal({ lead, isOpen, onClose, onUpdateLead, onSendEma
                   value={currentLead?.phone || ''}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
                   placeholder="Telefon numarası"
+                  className="mobile-button"
                 />
               ) : (
                 <div className="py-2">
@@ -174,6 +176,7 @@ export function LeadDetailModal({ lead, isOpen, onClose, onUpdateLead, onSendEma
                 value={currentLead?.website || ''}
                 onChange={(e) => handleInputChange('website', e.target.value)}
                 placeholder="Website adresi"
+                className="mobile-button"
               />
             ) : (
               <div className="py-2">
@@ -200,7 +203,7 @@ export function LeadDetailModal({ lead, isOpen, onClose, onUpdateLead, onSendEma
               <textarea
                 value={currentLead?.address || ''}
                 onChange={(e) => handleInputChange('address', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none mobile-button"
                 rows={3}
                 placeholder="Adres bilgisi"
               />
@@ -217,44 +220,46 @@ export function LeadDetailModal({ lead, isOpen, onClose, onUpdateLead, onSendEma
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md resize-none mobile-button"
               rows={4}
               placeholder="Bu lead hakkında notlarınızı buraya yazabilirsiniz..."
             />
           </div>
 
           {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
-            <Button 
+          <div className="flex flex-col gap-3 pt-4 border-t">
+            <Button
               onClick={() => onSendEmail(lead.id)}
               disabled={!currentLead?.email || currentLead?.status === 'email_sent'}
-              className="flex-1"
+              className="w-full mobile-button"
             >
               {currentLead?.status === 'email_sent' ? 'E-posta Gönderildi' : 'E-posta Gönder'}
             </Button>
-            
-            {currentLead?.website && (
-              <Button 
-                variant="outline"
-                onClick={() => window.open(
-                  currentLead.website?.startsWith('http') ? currentLead.website : `https://${currentLead.website}`,
-                  '_blank'
-                )}
-                className="flex-1"
-              >
-                Website'yi Ziyaret Et
-              </Button>
-            )}
-            
-            {currentLead?.phone && (
-              <Button 
-                variant="outline"
-                onClick={() => window.open(`tel:${currentLead.phone}`, '_self')}
-                className="flex-1"
-              >
-                Ara
-              </Button>
-            )}
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {currentLead?.website && (
+                <Button
+                  variant="outline"
+                  onClick={() => window.open(
+                    currentLead.website?.startsWith('http') ? currentLead.website : `https://${currentLead.website}`,
+                    '_blank'
+                  )}
+                  className="mobile-button"
+                >
+                  Website'yi Ziyaret Et
+                </Button>
+              )}
+
+              {currentLead?.phone && (
+                <Button
+                  variant="outline"
+                  onClick={() => window.open(`tel:${currentLead.phone}`, '_self')}
+                  className="mobile-button"
+                >
+                  Ara
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
