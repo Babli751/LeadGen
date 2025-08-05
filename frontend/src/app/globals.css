@@ -25,3 +25,63 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+/* Responsive improvements */
+@layer utilities {
+  .container {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+
+  /* Better mobile table styles */
+  .mobile-table-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 #f1f5f9;
+  }
+
+  .mobile-table-scroll::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  .mobile-table-scroll::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 3px;
+  }
+
+  .mobile-table-scroll::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 3px;
+  }
+
+  .mobile-table-scroll::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+  }
+}
+
+/* Mobile-specific improvements */
+@media (max-width: 768px) {
+  .container {
+    @apply px-3;
+  }
+
+  /* Better spacing for mobile */
+  .form-grid {
+    @apply space-y-4;
+  }
+
+  /* Improve button sizing on mobile */
+  .mobile-button {
+    @apply min-h-[44px] px-4 py-2;
+  }
+
+  /* Better modal sizing on mobile */
+  .modal-content {
+    @apply mx-2 my-4 max-h-[calc(100vh-2rem)];
+  }
+}
+
+/* Tablet improvements */
+@media (min-width: 768px) and (max-width: 1024px) {
+  .tablet-grid {
+    @apply grid-cols-2;
+  }
+}
